@@ -1,0 +1,137 @@
+#!/bin/bash
+
+VERSION=@VERSION@
+
+PREFIX=@PREFIX@
+
+if uname -a | grep -qi cygwin; then
+    export CYGWIN=1
+    export PATH=$(cygpath -au "$PROGRAMFILES\7-Zip"):$PATH
+    IFS=':'
+    export PATH=$(ls -d $(cygpath -au "$PROGRAMFILES\ImageMagick*")):$PATH
+    unset IFS
+else
+    export CYGWIN=0
+fi
+
+export PATH=$PATH:$PREFIX/bin:$PREFIX/share/img2epub/lib
+
+# Defaults
+# =====================================================================
+export GOPT__TITLE="Unknown"
+export GOPT__CREATOR="Img2Epub"
+export GOPT__LANGUAGE="en"
+export GOPT__PUBLISHER="Img2Epub"
+export GOPT__DATE="$(date +%Y)"
+export GOPT__SUBJECT="Images"
+export GOPT__TYPE="Manga, Comics"
+export GOPT__UUID=$(uuidgen)
+export GOPT__VSIZE=750
+export GOPT__HSIZE=580
+export GOPT__COLORS=16
+export GOPT__DITHER=0
+export GOPT__CUT='H'
+export GOPT__NOTRIM=0
+export GOPT__TRIM_VAL=20
+export GOPT__TRIM_ITER=2
+
+# Command line options processing
+# =====================================================================
+GETOPTIONS[0]="title:1:     ARG the title of the book"
+GETOPTIONS[1]="creator:1:   ARG the creator of the book"
+GETOPTIONS[2]="language:1:  ARG the language of the book"
+GETOPTIONS[3]="publisher:1: ARG the publisher  of the book"
+GETOPTIONS[4]="date:1:      ARG the date of the book"
+GETOPTIONS[5]="subject:1:   ARG the subject of the book"
+GETOPTIONS[6]="type:1:      ARG the type of the book"
+GETOPTIONS[7]="uuid:1:      ARG the Universal Unique Identifier of the book"
+GETOPTIONS[8]="vsize:1:     ARG the maximal vertical size of images in pixels"
+GETOPTIONS[9]="hsize:1:     ARG the maximal horizontal size of images in pixels"
+GETOPTIONS[10]="colors:1:    ARG = 2-256, the number of output colors"
+GETOPTIONS[11]="dither:0:    activate dithering for color reduction"
+GETOPTIONS[12]="cut:1:       ARG = 0|A|V|H, 0 = do not cut images,
+                                  A = cut all images in two,
+                                  H = cut only if image width > height,
+                                  V = cut only if image width < height"
+GETOPTIONS[13]="notrim:0:    force no trim border"
+GETOPTIONS[14]="trim_val:1:  ARG = 0-100, the % of tolerance from corner pixels to trim"
+GETOPTIONS[15]="trim_iter:1: ARG the number of trim iterations"
+GETOPTIONS[16]="output:1:    ARG the output filename"
+GETOPTIONS[17]="help:0:      display this help and exit"
+GETOPTIONS[18]="version:0:   output version information and exit"
+
+source $PREFIX/share/img2epub/lib/getoptions.sh
+
+# =====================================================================
+function help() {
+    cat <<EOF
+Usage : img2epub [OPTIONS] INPUT
+Create an epub book from a CBR, a CBZ or a directory with images
+OPTIONS :
+EOF
+    getoptions_help
+    exit $1
+}
+
+# =====================================================================
+if [ "${GOPT__HELP}" = "1" ]; then
+    help 0 1>&2
+fi
+
+if [ "${GOPT__VERSION}" = "1" ]; then
+    echo "img2epub $VERSION"
+    exit 0
+fi
+
+if [ "${GOPT_ERROR}" = "1" ]; then
+    cat <<EOF 1>&2
+img2epub: unrecognized option $GOPT_ERROR_STR.
+Try \`img2epub --help' for more information.
+EOF
+    exit 1
+fi
+
+
+if [ ${GOPT_ARGC} -gt 1 ]; then
+    cat <<EOF 1>&2
+img2epub: too many arguments.
+Try \`img2epub --help' for more information.
+EOF
+    exit 1
+fi
+
+if [ ${GOPT_ARGC} -lt 1 ]; then
+    cat <<EOF 1>&2
+img2epub: too few arguments.
+Try \`img2epub --help' for more information.
+EOF
+    exit 1
+fi
+
+
+if  [ "${GOPT__CUT}" != "0" ] &&
+    [ "${GOPT__CUT}" != "A" ] &&
+    [ "${GOPT__CUT}" != "H" ] &&
+    [ "${GOPT__CUT}" != "V" ];
+then
+    cat <<EOF 1>&2
+img2epub: invalid cut parameter.
+Try \`img2epub --help' for more information.
+EOF
+    exit 1
+fi
+
+export INPUT="${GOPT_ARGV}"
+
+# Display Exported Options
+# =====================================================================
+env | egrep "^INPUT="
+env | egrep "^GOPT__" | sort
+
+
+# Main processing
+# =====================================================================
+source $PREFIX/share/img2epub/lib/main.sh
+
+#àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ
+#aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY

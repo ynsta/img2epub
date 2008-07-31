@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<package version="2.0"
+	 unique-identifier="PrimaryID"
+	 xmlns="http://www.idpf.org/2007/opf">
+
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/"
+	    xmlns:opf="http://www.idpf.org/2007/opf"
+	    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <dc:title>@TITLE@</dc:title>
+    <dc:identifier id="PrimaryID">urn:uuid:@UUID@</dc:identifier>
+    <dc:language>@LANGUAGE@</dc:language>
+    <dc:creator opf:file-as="@CREATOR@">@CREATOR@</dc:creator>
+    <dc:publisher>@PUBLISHER@</dc:publisher>
+    <dc:description></dc:description>
+    <dc:coverage></dc:coverage>
+    <dc:source></dc:source>
+    <dc:date>@DATE@</dc:date>
+    <dc:subject>@SUBJECT@</dc:subject>
+    <dc:type>@TYPE@</dc:type>
+    <dc:rights></dc:rights>
+
+  </metadata>
+
+  <manifest>
+
+    <item id="title" href="title.xml" media-type="application/xhtml+xml"/>
+    <item id="css_main" href="css/main.css" media-type="text/css"/>
+    <item id="ncx" href="content.ncx" media-type="application/x-dtbncx+xml"/>
