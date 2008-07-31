@@ -5,12 +5,21 @@ if [ ! -f install.sh ] || [ ! -f img2epub.in ]; then
     exit 1
 fi
 
+IFS='
+'
+rm -f $(find . -name '*~')
+unset IFS
+
 VERSION=$(cat VERSION | tr 'A-Z' 'a-z')
+
+
+mkdir -p ../img2epub-$VERSION
+cp -rf *  ../img2epub-$VERSION
+opwd="${PWD}"
 cd ..
 
-tar -cvzf img2epub-$VERSION.tar.gz img2epub
+tar --exclude=.svn -czf img2epub-$VERSION.tgz img2epub-$VERSION
+md5sum img2epub-$VERSION.tgz > img2epub-$VERSION.md5
 
-ARCHNAME=img2epub-${VERSION}_$(md5sum img2epub-$VERSION.tar.gz | awk '{ print $1 }').tar.gz
-mv img2epub-$VERSION.tar.gz $ARCHNAME
-
-echo "=> $ARCHNAME"
+cd "$opwd"
+rm -rf ../img2epub-$VERSION
