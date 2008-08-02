@@ -12,9 +12,13 @@ IFS='
 rm -f $(find . -name '*~')
 unset IFS
 
-mkdir -p     ${PREFIX}/share/img2epub/data/OEBPS/images
-cp -rvf data ${PREFIX}/share/img2epub/
-cp -rvf lib  ${PREFIX}/share/img2epub/
+mkdir -p         ${PREFIX}/share/img2epub/data/OEBPS/images
+cp -rf data      ${PREFIX}/share/img2epub/
+cp -rf lib       ${PREFIX}/share/img2epub/
+cp -rf VERSION   ${PREFIX}/share/img2epub/
+cp -rf README    ${PREFIX}/share/img2epub/
+find 2>/dev/null ${PREFIX}/share/img2epub/ -name '.svn' -exec rm -rf \{\} \;
+
 chmod +x \
     ${PREFIX}/share/img2epub/lib/*.sh \
     ${PREFIX}/share/img2epub/lib/*.sed
@@ -28,7 +32,7 @@ chmod 755 ${PREFIX}/bin/img2epub
 
 cat <<EOF
 
-${PREFIX}/bin/img2epub installed !
+${PREFIX}/bin/img2epub $VERSION installed !
 
 You should add ${PREFIX}/bin in your PATH if not already done.
 

@@ -52,6 +52,7 @@ GETOPTIONS[11]="dither:0:    activate dithering for color reduction"
 GETOPTIONS[12]="cut:1:       ARG = 0|A|V|H, 0 = do not cut images,
                                   A = cut all images in two,
                                   H = cut only if image width > height,
+                                  R = cut only if image width > height and switch the 2 images,
                                   V = cut only if image width < height"
 GETOPTIONS[13]="notrim:0:    force no trim border"
 GETOPTIONS[14]="trim_val:1:  ARG = 0-100, the % of tolerance from corner pixels to trim"
@@ -112,6 +113,7 @@ fi
 if  [ "${GOPT__CUT}" != "0" ] &&
     [ "${GOPT__CUT}" != "A" ] &&
     [ "${GOPT__CUT}" != "H" ] &&
+    [ "${GOPT__CUT}" != "R" ] &&
     [ "${GOPT__CUT}" != "V" ];
 then
     cat <<EOF 1>&2

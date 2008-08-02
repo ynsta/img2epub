@@ -1,0 +1,37 @@
+Img2epub Converter
+
+Description
+
+    Convert images into epub documents. ".epub" is the file extension of an XML format for reflowable digital books and publications. 
+
+Portability
+
+    Linux, Windows and potentially all OS where dependcies are ported to. 
+
+Input format
+
+    Supported file formats : .cbz, .cbr, directory 
+
+Output format
+
+    Supported file formats : .epub (http://www.idpf.org/) 
+
+Fonctionnality
+
+    * Resize
+    * Trim borders
+    * Reduce Color
+    * Cut in two peace all, horizontal or vertical images
+    * ... 
+
+Dependencies
+
+    * ImageMagick
+    * 7-Zip
+    * Cygwin (for MS Windows users) with following packages :
+          o uuidgen (e2fsprogs : Ext2 filesystem utilities)
+          o bash and common command line tools (sed, gawk, ...) 
+
+
+see http://code.google.com/p/img2epub/ for more informations and last version
+ 

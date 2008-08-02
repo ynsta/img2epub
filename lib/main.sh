@@ -13,6 +13,7 @@ elif [ -f "${INPUT}" ] && [ ! -d "${INPUT}" ] && [ "${INPUT}" != "${INPUT/.cbr/}
     RMDIR=1
 
 elif [ -d "$INPUT" ]; then
+
     IMGDIR="${INPUT}"
     RMDIR=0
 
@@ -91,38 +92,39 @@ done
 
 cd "${EPUBDIR}/OEBPS/images"
 
-CONVERT_ANTE_OPT=""
+CONVERT_OPT=""
 if [ "$GOPT__NOTRIM" != "1" ] && [ $GOPT__TRIM_ITER -gt 0 ] ; then
     N=0; while [ $N -lt $GOPT__TRIM_ITER ]; do
-	CONVERT_ANTE_OPT="${CONVERT_ANTE_OPT}
+	CONVERT_OPT="${CONVERT_OPT}
 -fuzz
 ${GOPT__TRIM_VAL}%
 -trim"
 	N=$((N+1))
     done
-    CONVERT_ANTE_OPT="${CONVERT_ANTE_OPT}
+    CONVERT_OPT="${CONVERT_OPT}
 +repage"
 fi
 
 if [ "$GOPT__DITHER" != "1" ]; then
-    CONVERT_ANTE_OPT="${CONVERT_ANTE_OPT}
+    CONVERT_OPT="${CONVERT_OPT}
 +dither"
 else
-    CONVERT_ANTE_OPT="${CONVERT_ANTE_OPT}
+    CONVERT_OPT="${CONVERT_OPT}
 -dither"
 fi
 
 N=0;
 for img in $(cat $LIST1); do
 
-    w=$(identify -format '%w' "${img}" | sed -e 's/[\n\r]//g')
-    h=$(identify -format '%h' "${img}" | sed -e 's/[\n\r]//g')
+    w=$(identify -format '%w' "${img}" | sed -e '1,1s/[^0-9]//g')
+    h=$(identify -format '%h' "${img}" | sed -e '1,1s/[^0-9]//g')
 
     echo -n "Pre processing $img"
     echo -n " (${w}x${h}) ... "
 
     if  ([ "$GOPT__CUT" = "A" ])                  ||
 	([ "$GOPT__CUT" = "H" ] && [ $w -gt $h ]) ||
+	([ "$GOPT__CUT" = "R" ] && [ $w -gt $h ]) ||
 	([ "$GOPT__CUT" = "V" ] && [ $w -lt $h ])
     then
 	tmp=tmp_${RANDOM}
@@ -130,23 +132,34 @@ for img in $(cat $LIST1); do
 	echo -n "(cut) "
 
 	convert "$img" \
-	    $CONVERT_ANTE_OPT \
 	    -rotate '-90<' -crop '50,100%' \
 	    -type Grayscale -quantize Gray \
-	    -level 8%,92%,1.2 \
+	    -normalize \
+	    -level 8%,92%,1.2} \
+	    $CONVERT_OPT \
 	    -resize ${GOPT__HSIZE}x${GOPT__VSIZE} \
+	    -normalize \
 	    -colors ${GOPT__COLORS} \
+	    -normalize \
 	    ${tmp}.png
 
 	printf -v NLF "%08d" $N;
-	mv ${tmp}-0.png ${NLF}.png
+	if [ "$GOPT__CUT" = "R" ]; then
+	    mv ${tmp}-1.png ${NLF}.png
+	else
+	    mv ${tmp}-0.png ${NLF}.png
+	fi
 	echo ${NLF}.png >> $LIST2
 
 	NUMBERS[$N]=${NLF}
 	N=$((N+1))
 
 	printf -v NLF "%08d" $N;
-	mv ${tmp}-1.png ${NLF}.png
+	if [ "$GOPT__CUT" = "R" ]; then
+	    mv ${tmp}-0.png ${NLF}.png
+	else
+	    mv ${tmp}-1.png ${NLF}.png
+	fi
 	echo ${NLF}.png >> $LIST2
 
 	NUMBERS[$N]=${NLF}
@@ -157,12 +170,15 @@ for img in $(cat $LIST1); do
 	printf -v NLF "%08d" $N
 
 	convert "$img" \
-	    $CONVERT_ANTE_OPT \
 	    -rotate '+90>' \
 	    -type Grayscale -quantize Gray \
+	    -normalize \
 	    -level 8%,92%,1.2 \
+	    $CONVERT_OPT \
 	    -resize ${GOPT__HSIZE}x${GOPT__VSIZE} \
+	    -normalize \
 	    -colors ${GOPT__COLORS} \
+	    -normalize \
 	    ${NLF}.png
 
 	echo ${NLF}.png >> $LIST2
