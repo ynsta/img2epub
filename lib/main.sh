@@ -120,9 +120,23 @@ fi
 N=0;
 for img in $(cat $LIST1); do
 
-    temp=$(identify -format '%w:%h' "${img}" | sed -e '1,1s/[^0-9:]//g')
-    printf -v w '%d' ${temp%:*}
-    printf -v h '%d' ${temp#*:}
+    w=0
+    h=0
+    retry=10
+    while [ $w -eq 0 ] || [ $h -eq 0 ]; do
+        temp=$(identify -format '%w:%h' "${img}" | sed -e '1,1s/[^0-9:]//g')
+	printf -v w '%d' ${temp%:*}
+	printf -v h '%d' ${temp#*:}
+
+	if [ $w -eq 0 ] || [ $h -eq 0 ]; then
+	    sleep 1;
+	fi
+
+	retry=$((retry - 1))
+	if [ $retry -le 0 ]; then
+	    break
+	fi
+    done
 
     echo -n "Pre processing $img"
     echo -n " (${w}x${h}) ... "
