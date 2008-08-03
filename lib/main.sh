@@ -5,12 +5,16 @@ if   [ -f "${INPUT}" ] && [ ! -d "${INPUT}" ] && [ "${INPUT}" != "${INPUT/.cbz/}
     IMGDIR="${INPUT/.cbz/}_${RANDOM}"
     7z x -y "${INPUT}" -o"${IMGDIR}"
     RMDIR=1
+    sync
+    sleep 1
 
 elif [ -f "${INPUT}" ] && [ ! -d "${INPUT}" ] && [ "${INPUT}" != "${INPUT/.cbr/}" ]; then
 
     IMGDIR="${INPUT/.cbr/}_${RANDOM}"
     7z x -y "${INPUT}" -o"${IMGDIR}"
     RMDIR=1
+    sync
+    sleep 1
 
 elif [ -d "$INPUT" ]; then
 
@@ -116,8 +120,9 @@ fi
 N=0;
 for img in $(cat $LIST1); do
 
-    w=$(identify -format '%w' "${img}" | sed -e '1,1s/[^0-9]//g')
-    h=$(identify -format '%h' "${img}" | sed -e '1,1s/[^0-9]//g')
+    temp=$(identify -format '%w:%h' "${img}" | sed -e '1,1s/[^0-9:]//g')
+    printf -v w '%d' ${temp%:*}
+    printf -v h '%d' ${temp#*:}
 
     echo -n "Pre processing $img"
     echo -n " (${w}x${h}) ... "
