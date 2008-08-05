@@ -42,9 +42,9 @@ function epub_name() {
 
 # Tempory Files and Directories Creation
 # =====================================================================
-LAUNCHDIR=$(pwd)
+LAUNCHDIR="$(pwd)"
 cd "${IMGDIR}"
-IMGDIR=$(pwd)
+IMGDIR="$(pwd)"
 cd ..
 if [ "${GOPT__OUTPUT}" != "" ]; then
     cd "${LAUNCHDIR}"
@@ -73,7 +73,7 @@ touch $LISTC
 
 # Images Pre Processing
 # =====================================================================
-find ${IMGDIR} -iname '*.jpg' -or -iname '*.png' -or -iname '*.bmp' -or -iname '*.gif' | sort -g > $LIST0
+find "${IMGDIR}" -iname '*.jpg' -or -iname '*.png' -or -iname '*.bmp' -or -iname '*.gif' | sort -g > $LIST0
 
 IFS='
 '
@@ -210,7 +210,7 @@ done
 
 
 if [ "$RMDIR" = "1" ]; then
-    rm -rf ${IMGDIR}
+    rm -rf "${IMGDIR}"
 fi
 
 # EPUB Contents Creation
@@ -304,11 +304,11 @@ mv "${EPUB}".zip ../"${EPUB}".epub
 
 # Temporary Files and Directories Cleaning
 # =====================================================================
-cd ${LAUNCHDIR}
+cd "${LAUNCHDIR}"
 rm -f $LIST0 $LIST1 $LIST2 $LISTC
 
 n=0;
-while ! rm -rf ${EPUBDIR} &>/dev/null; do
+while ! rm -rf "${EPUBDIR}" &>/dev/null; do
     sync
     sleep 1
     n=$((n+1))
