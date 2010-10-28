@@ -26,11 +26,9 @@ Fonctionnality
 
 Dependencies
 
-    * ImageMagick
-    * 7-Zip
-    * Cygwin (for MS Windows users) with following packages :
-          o uuidgen (e2fsprogs : Ext2 filesystem utilities)
-          o bash and common command line tools (sed, gawk, ...)
+    * ImageMagick (must be in path)
+    * 7-Zip (must be in path)
+    * Python
 
 
 see http://code.google.com/p/img2epub/ for more informations and last version

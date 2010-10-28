@@ -1,38 +1,27 @@
 #!/bin/bash
 
-PREFIX=/usr/local
+if [ "$PREFIX" == "" ]; then
+    PREFIX=/usr/local
+fi
 
-if [ ! -f install.sh ] || [ ! -f img2epub.in ]; then
+if [ ! -f install.sh ] || [ ! -f img2epub.py ]; then
     echo 1>&2 "install.sh must be launch from the install directory"
     exit 1
 fi
 
-IFS='
-'
-rm -f $(find . -name '*~')
-unset IFS
+mkdir -p           ${PREFIX}/bin
+mkdir -p           ${PREFIX}/share/img2epub/lib
+cp -vf lib/*.py?   ${PREFIX}/share/img2epub/lib
+cp -vf img2epub.py ${PREFIX}/share/img2epub
+cp -vf README      ${PREFIX}/share/img2epub
 
-mkdir -p         ${PREFIX}/share/img2epub/data/OEBPS/images
-cp -rf data      ${PREFIX}/share/img2epub/
-cp -rf lib       ${PREFIX}/share/img2epub/
-cp -rf VERSION   ${PREFIX}/share/img2epub/
-cp -rf README    ${PREFIX}/share/img2epub/
-find 2>/dev/null ${PREFIX}/share/img2epub/ -name '.svn' -exec rm -rf \{\} \;
-
-chmod +x \
-    ${PREFIX}/share/img2epub/lib/*.sh \
-    ${PREFIX}/share/img2epub/lib/*.sed
-
-VERSION=$(cat VERSION)
-sed -e "s+@PREFIX@+${PREFIX}+" \
-    -e "s+@VERSION@+${VERSION}+" \
-    img2epub.in > \
-    ${PREFIX}/bin/img2epub
+cat <<EOF > ${PREFIX}/bin/img2epub
+#!$(which python) ${PREFIX}/share/img2epub/img2epub
+EOF
 chmod 755 ${PREFIX}/bin/img2epub
 
 cat <<EOF
-
-${PREFIX}/bin/img2epub $VERSION installed !
+$(${PREFIX}/bin/img2epub --version) installed !
 
 You should add ${PREFIX}/bin in your PATH if not already done.
 
