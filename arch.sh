@@ -1,11 +1,18 @@
 #!/bin/bash
 
-if [ ! -f install.sh ] || [ ! -f img2epub ]; then
+if [ ! -f install.sh ] || [ ! -f img2epub.in ]; then
     echo 1>&2 "install.sh must be launch from the install directory"
     exit 1
 fi
 
-VERSION=$(python img2epub --version | head -n 1 | cut -d ' ' -f 2)
+IFS='
+'
+rm -f $(find . -name '*~')
+unset IFS
+
+VERSION=$(cat VERSION | tr 'A-Z' 'a-z')
+
+
 mkdir -p ../img2epub-$VERSION
 cp -rf *  ../img2epub-$VERSION
 opwd="${PWD}"
