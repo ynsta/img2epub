@@ -1,22 +1,24 @@
-Img2epub Converter
+-*- outline -*-
 
-Description
+* Img2epub Converter
+
+** Description
 
     Convert images into epub documents. ".epub" is the file extension of an XML format for reflowable digital books and publications.
 
-Portability
+** Portability
 
     Linux, Windows and potentially all OS where dependcies are ported to.
 
-Input format
+** Input format
 
-    Supported file formats : .cbz, .cbr, directory
+    Supported file formats : .cbz, .cbr, zip, rar, 7zip, directory
 
-Output format
+** Output format
 
     Supported file formats : .epub (http://www.idpf.org/)
 
-Fonctionnality
+** Fonctionnality
 
     * Resize
     * Trim borders
@@ -24,11 +26,11 @@ Fonctionnality
     * Cut in two pieces all, horizontal or vertical images
     * ...
 
-Dependencies
+** Dependencies
 
     * ImageMagick (must be in path)
     * 7-Zip (must be in path)
-    * Python
+    * Python 2.5 +
 
 
 see http://code.google.com/p/img2epub/ for more informations and last version
