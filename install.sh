@@ -4,15 +4,15 @@ if [ "$PREFIX" == "" ]; then
     PREFIX=/usr/local
 fi
 
-if [ ! -f install.sh ] || [ ! -f img2epub.py ]; then
+if [ ! -f install.sh ] || [ ! -f img2epub ]; then
     echo 1>&2 "install.sh must be launch from the install directory"
     exit 1
 fi
 
 mkdir -p           ${PREFIX}/bin
 mkdir -p           ${PREFIX}/share/img2epub/lib
-cp -vf lib/*.py?   ${PREFIX}/share/img2epub/lib
-cp -vf img2epub.py ${PREFIX}/share/img2epub
+cp -vf lib/*.py    ${PREFIX}/share/img2epub/lib
+cp -vf img2epub    ${PREFIX}/share/img2epub
 cp -vf README      ${PREFIX}/share/img2epub
 
 cat <<EOF > ${PREFIX}/bin/img2epub
@@ -21,7 +21,10 @@ EOF
 chmod 755 ${PREFIX}/bin/img2epub
 
 cat <<EOF
-$(${PREFIX}/bin/img2epub --version) installed !
+
+$(${PREFIX}/bin/img2epub --version)
+
+installed !
 
 You should add ${PREFIX}/bin in your PATH if not already done.
 
