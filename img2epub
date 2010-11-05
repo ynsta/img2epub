@@ -16,7 +16,7 @@ import fileutils
 import epub
 
 
-VERSION="1.0"
+VERSION="1.1"
 AUTHOR="Stany MARCEL <stanypub@gmail.com>"
 URL="http://code.google.com/p/img2epub/"
 
