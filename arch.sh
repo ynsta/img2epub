@@ -8,11 +8,8 @@ fi
 VERSION=$(python img2epub --version | head -n 1 | cut -d ' ' -f 2)
 mkdir -p ../img2epub-$VERSION
 cp -rf *  ../img2epub-$VERSION
-opwd="${PWD}"
+find ../img2epub-$VERSION -iname '*.pyc' -exec rm \{\} \;
 cd ..
-
 tar --exclude=.svn -czf img2epub-$VERSION.tgz img2epub-$VERSION
 md5sum img2epub-$VERSION.tgz > img2epub-$VERSION.md5
-
-cd "$opwd"
-rm -rf ../img2epub-$VERSION
+rm -rf img2epub-$VERSION
