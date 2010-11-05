@@ -272,12 +272,12 @@ def img_convert(opts, src, dst, idx, convert_opts):
 
 def create_epub(opts, epub_name, image_list, chapter_list, chapter_map):
 
+    convert_opts = []
     if not opts.notrim and opts.trim_iter > 0:
-        convert_opt = []
         for i in range(opts.trim_iter):
-            convert_opt = convert_opt + ['-fuzz', str(opts.trim_val) + '%' , '-trim']
+            convert_opts = convert_opts + ['-fuzz', str(opts.trim_val) + '%' , '-trim']
     if not opts.dither:
-        convert_opt = convert_opt + ['+dither']
+        convert_opts = convert_opts + ['+dither']
 
     epub_name = os.path.abspath(epub_name)
 
@@ -303,7 +303,7 @@ def create_epub(opts, epub_name, image_list, chapter_list, chapter_map):
         dst_chapter_map[cname] = []
         for ii in chapter_map[cname]:
             src_img = image_list[ii]
-            for dst_img in img_convert(opts, src_img, ('C%03dI' % ci), idx, convert_opt):
+            for dst_img in img_convert(opts, src_img, ('C%03dI' % ci), idx, convert_opts):
                 dst_chapter_map[cname].append(idx)
                 dst_image_list.append(dst_img)
                 (f, d) = image_xml(dst_img)
