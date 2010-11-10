@@ -15,13 +15,7 @@ import binutils
 import fileutils
 import epub
 
-
-VERSION="1.1"
-AUTHOR="Stany MARCEL <stanypub@gmail.com>"
-URL="http://code.google.com/p/img2epub/"
-
-IMGEXTS = ['jpg', 'png', 'bmp', 'gif']
-ARCHEXTS = ['zip', '7zip', 'cbz', 'cbr', 'rar']
+from config import *
 
 def img2epub(opts, arg):
 
@@ -37,13 +31,16 @@ def img2epub(opts, arg):
         sys.exit(1)
 
     # Generate output with extension
-    if opts.output:
-        epub_name = opts.output
-    else:
-        epub_name = '_'.join([opts.creator, opts.title, opts.language])
-        epub_name = ''.join([ c for c in re.split('[^a-zA-Z0-9,_ -]', epub_name) ])
+    epub_name = '_'.join([opts.creator, opts.title, opts.language])
+    epub_name = ''.join([ c for c in re.split('[^a-zA-Z0-9,_ -]', epub_name) ])
     epub_name = textutils.remove_accent(epub_name.lower())
-    epub_name = fileutils.add_ext(epub_name, '.epub')
+
+    if opts.output:
+        if os.path.isdir(opts.output):
+            opts.output = os.path.join(opts.output, epub_name)
+    else:
+        opts.output = epub_name
+    opts.output = fileutils.add_ext(opts.output, '.epub')
 
     # Check and parse input
     if len(arg) == 0:
@@ -85,7 +82,7 @@ def img2epub(opts, arg):
             chapter_map[cname].append(i)
 
     # Epub creation
-    epub.create_epub(opts, epub_name, image_list, chapter_list, chapter_map)
+    epub.create_epub(opts, opts.output, image_list, chapter_list, chapter_map)
 
     # Temporary directory removed
     shutil.rmtree(tmpd, ignore_errors=True)

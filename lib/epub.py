@@ -218,6 +218,7 @@ def img_convert(opts, src, dst, idx, convert_opts):
     (r, s, e) = binutils.run('identify', ['-format', '%w:%h', src])
 
     if r != 0 or e != '':
+        sys.stderr.write(e)
         (w, h) = (0, 0)
     else:
         (w, h) = s.strip().split(':')
@@ -244,6 +245,7 @@ def img_convert(opts, src, dst, idx, convert_opts):
                 '-colors', str(opts.colors),
                 '-normalize',
                 'TMP.png'])
+        if e: sys.stderr.write(e)
         if opts.cut == 'R':
             os.rename('TMP-1.png', os.path.join('OEBPS', 'images', name[0] + '.png'))
             os.rename('TMP-0.png', os.path.join('OEBPS', 'images', name[1] + '.png'))
@@ -266,12 +268,18 @@ def img_convert(opts, src, dst, idx, convert_opts):
                 '-colors', str(opts.colors),
                 '-normalize',
                 'TMP.png'])
+        if e: sys.stderr.write(e)
         os.rename('TMP.png', os.path.join('OEBPS', 'images', name[0] + '.png'))
         print 'Done'
     return name
 
-def create_epub(opts, epub_name, image_list, chapter_list, chapter_map):
-
+def create_epub(opts,
+                epub_name,
+                image_list,
+                chapter_list,
+                chapter_map,
+                callback = None,
+                callback_arg = None):
     convert_opts = []
     if not opts.notrim and opts.trim_iter > 0:
         for i in range(opts.trim_iter):
@@ -309,6 +317,7 @@ def create_epub(opts, epub_name, image_list, chapter_list, chapter_map):
                 (f, d) = image_xml(dst_img)
                 open(f, 'w+b').write(d)
                 idx = idx + 1
+            if callback: callback()
 
     (f, d) = content_ncx(opts, chapter_list, dst_chapter_map, dst_image_list)
     open(f, 'w+b').write(d)
@@ -321,19 +330,23 @@ def create_epub(opts, epub_name, image_list, chapter_list, chapter_map):
     except:
         None
 
-    seven_opt = ['a', '-y', '-tzip', '-mm=Copy', '-mx=0', '-scsUTF-8']
+    seven_opt = ['a', '-y', '-tzip', '-mm=Copy', '-scsUTF-8']
 
-    (r1,s,e) = binutils.run('7z', seven_opt + [epub_name, 'mimetype'])
+    (r1,s,e) = binutils.run('7z', seven_opt + ['-mx=0', epub_name, 'mimetype'])
+    if e: sys.stderr.write(e)
     if r1 != 0:
-        (r1,s,e) = binutils.run('7z', seven_opt[:-1] + [epub_name, 'mimetype'])
-
+        (r1,s,e) = binutils.run('7z', seven_opt[:-1] + ['-mx=0', epub_name, 'mimetype'])
+        if e: sys.stderr.write(e)
     (r2,s,e) = binutils.run('7z', seven_opt + [epub_name, 'META-INF'])
+    if e: sys.stderr.write(e)
     if r2 != 0:
-       (r2,s,e) = binutils.run('7z', seven_opt[:-1] + [epub_name, 'META-INF'])
-
+        (r2,s,e) = binutils.run('7z', seven_opt[:-1] + [epub_name, 'META-INF'])
+        if e: sys.stderr.write(e)
     (r3,s,e) = binutils.run('7z', seven_opt + [epub_name, 'OEBPS'])
+    if e: sys.stderr.write(e)
     if r3 != 0:
-       (r3,s,e) = binutils.run('7z', seven_opt[:-1] + [epub_name, 'OEBPS'])
+        (r3,s,e) = binutils.run('7z', seven_opt[:-1] + [epub_name, 'OEBPS'])
+        if e: sys.stderr.write(e)
 
     if not r1 and not r2 and not r3:
         print '\n', epub_name, 'created'

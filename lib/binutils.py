@@ -22,7 +22,7 @@ def find(bin):
     path = execbin_cache.get(bin[0], None)
     if not path:
         path = _lookup(bin)
-        if os.access(path, os.X_OK):
+        if path and os.access(path, os.X_OK):
             execbin_cache[bin[0]] = path
         else:
             path = None

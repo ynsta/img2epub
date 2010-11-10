@@ -7,7 +7,7 @@ import optparse
 
 def genparser(version, author, url):
     NOW  = str(datetime.datetime.now().year)
-    UUID = str(uuid.uuid1())
+    UUID = '00000000-0000-0000-0000-000000000000'
 
     parser = optparse.OptionParser(usage="%prog [options] input",
                                    version="%prog " + version + ' by ' + author + '\n' + url,
