@@ -6,12 +6,7 @@ import sys
 
 from PySide import QtCore, QtGui
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
-
-import options
-import gui
-import config
-
+from img2epub import options, config, gui
 
 def img2epubgui(opts, args):
 
