@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ ! -f install.sh ] || [ ! -f img2epub ]; then
-    echo 1>&2 "install.sh must be launch from the install directory"
+if [ ! -f arch.sh ] || [ ! -f img2epub.py ]; then
+    echo 1>&2 "arch.sh must be launch from the install directory"
     exit 1
 fi
 
