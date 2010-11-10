@@ -5,7 +5,7 @@ if [ ! -f arch.sh ] || [ ! -f img2epub.py ]; then
     exit 1
 fi
 
-VERSION=$(python img2epub --version | head -n 1 | cut -d ' ' -f 2)
+VERSION=$(python img2epub.py --version | head -n 1 | cut -d ' ' -f 2)
 mkdir -p ../img2epub-$VERSION
 cp -rf *  ../img2epub-$VERSION
 find ../img2epub-$VERSION -iname '*.pyc' -exec rm \{\} \;
