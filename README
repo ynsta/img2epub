@@ -24,6 +24,7 @@
     * Trim borders
     * Reduce Color
     * Cut in two pieces all, horizontal or vertical images
+    * QT Graphical Interface
     * ...
 
 ** Dependencies
@@ -31,6 +32,6 @@
     * ImageMagick (must be in path)
     * 7-Zip (must be in path)
     * Python 2.5 +
-
+    * PySide for GUI
 
 see http://code.google.com/p/img2epub/ for more informations and last version

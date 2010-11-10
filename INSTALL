@@ -1,28 +1,11 @@
 -*- outline -*-
 
-* Img2Epub installation
-
-
-** Posix (Linux, Cygwin, ...)
+* Img2Epub installation from sources
 
 Python, 7zip and ImageMagick must be previously installed
 
-go inside img2epub extracted folder and run:
+For the GUI also install PySide
 
-./install.sh for usr/local
+Run
 
-or
-
-PREFIX=PATH ./install.sh
-
-
-** Windows
-
-Python, 7zip and ImageMagick must be previously installed and in system or user
-Path.
-
-Copy img2epub extracted folder where you want (for example C:\Program Files)
-
-to launch it open cmd shell and run
-
-python "C:\Program Files\img2epub\img2epub" --help
+python setup.py install
