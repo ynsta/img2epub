@@ -224,7 +224,7 @@ class Img2Epub(QtGui.QWidget):
     def runEnable(self):
         try:
             otext = self.ui.lineEditOutput.text()
-            opath = os.path.dirname(otext)
+            opath = os.path.dirname(os.path.abspath(otext))
             res = (len(self.image_list) > 0 and
                    os.access(opath, os.W_OK))
         except:

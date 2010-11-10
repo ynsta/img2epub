@@ -7,15 +7,7 @@ import sys
 import shutil
 import tempfile
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
-
-import options
-import textutils
-import binutils
-import fileutils
-import epub
-
-from config import *
+from img2epub import options, textutils, binutils, fileutils, epub, config
 
 def img2epub(opts, arg):
 
@@ -60,7 +52,7 @@ def img2epub(opts, arg):
     tmpd = tempfile.mkdtemp()
 
     # Extracting archives given as program arguments
-    alist = fileutils.find_by_exts(arg, ARCHEXTS)
+    alist = fileutils.find_by_exts(arg, config.ARCHEXTS)
     for a in alist:
         adir = os.path.join(tmpd, fileutils.rem_ext(a))
         (r,s,e) = binutils.run('7z', ['x', a, '-o' + adir])
@@ -68,7 +60,7 @@ def img2epub(opts, arg):
             arg.append(adir)
 
     # Looking for images
-    flist = fileutils.find_by_exts(arg, IMGEXTS)
+    flist = fileutils.find_by_exts(arg, config.IMGEXTS)
     image_list   = [os.path.abspath(x) for x in flist]
     chapter_map  = {}
     chapter_list = []
@@ -89,6 +81,6 @@ def img2epub(opts, arg):
 
 
 if __name__ == '__main__':
-    parser = options.genparser(VERSION, AUTHOR, URL)
+    parser = options.genparser(config.VERSION, config.AUTHOR, config.URL)
     (o, a) = parser.parse_args()
     img2epub(o, a)
