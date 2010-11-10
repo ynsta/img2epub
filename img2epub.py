@@ -7,7 +7,7 @@ import sys
 import shutil
 import tempfile
 
-from img2epub import options, textutils, binutils, fileutils, epub, config
+from i2e import options, textutils, binutils, fileutils, epub, config
 
 def img2epub(opts, arg):
 
@@ -81,6 +81,6 @@ def img2epub(opts, arg):
 
 
 if __name__ == '__main__':
-    parser = options.genparser(config.VERSION, config.AUTHOR, config.URL)
+    parser = options.genparser(config.VERSION, config.AUTHOR, config.AUTHOR_EMAIL, config.URL)
     (o, a) = parser.parse_args()
     img2epub(o, a)

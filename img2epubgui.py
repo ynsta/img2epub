@@ -6,7 +6,7 @@ import sys
 
 from PySide import QtCore, QtGui
 
-from img2epub import options, config, gui
+from i2e import options, config, gui
 
 def img2epubgui(opts, args):
 
@@ -16,6 +16,6 @@ def img2epubgui(opts, args):
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    parser = options.genparser(config.VERSION, config.AUTHOR, config.URL)
+    parser = options.genparser(config.VERSION, config.AUTHOR, config.AUTHOR_EMAIL, config.URL)
     (o, a) = parser.parse_args()
     img2epubgui(o, a)

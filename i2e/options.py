@@ -5,12 +5,12 @@ import uuid
 import datetime
 import optparse
 
-def genparser(version, author, url):
+def genparser(version, author, email, url):
     NOW  = str(datetime.datetime.now().year)
     UUID = '00000000-0000-0000-0000-000000000000'
 
     parser = optparse.OptionParser(usage="%prog [options] input",
-                                   version="%prog " + version + ' by ' + author + '\n' + url,
+                                   version="%prog " + version + ' by ' + author + ' <' + email + '>\n' + url,
                                    description="Creates an epub book from a CBR, "
                                    "a CBZ or a directory with images. Last version is available at " + url)
 
