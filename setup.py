@@ -11,5 +11,9 @@ if __name__ == '__main__':
           url          = config.URL,
           scripts      = ['img2epub.py',
                           'img2epubgui.py',
-                          'img2epubgui.pyw'],
+                          'postinstall_win32.py'],
           packages     = ['i2e'])
+
+
+# generate windows installer with:
+# python setup.py bdist_wininst --install-script postinstall_win32.py
