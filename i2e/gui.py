@@ -185,16 +185,18 @@ class Img2Epub(QtGui.QWidget):
             warnMessage(self, notfound)
             return
 
+        zinputs = []
+
         # Extracting archives given as program arguments
         alist = fileutils.find_by_exts(inputs, config.ARCHEXTS)
         for a in alist:
-            adir = os.path.join(self.tmpd, fileutils.rem_ext(a))
-            (r,s,e) = binutils.run('7z', ['x', a, '-o' + adir])
+            adir = os.path.join(self.tmpd, fileutils.rem_ext(os.path.basename(a)))
+            (r,s,e) = binutils.run('7z', ['x', a, '-y', '-o' + adir])
             if not r:
-                arg.append(adir)
+                zinputs.append(adir)
 
         # Looking for images
-        flist = fileutils.find_by_exts(inputs, config.IMGEXTS)
+        flist = fileutils.find_by_exts(inputs + zinputs, config.IMGEXTS)
         self.image_list   = [os.path.abspath(x) for x in flist]
         self.chapter_map  = {}
         self.chapter_list = []

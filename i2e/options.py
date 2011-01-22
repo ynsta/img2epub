@@ -47,13 +47,13 @@ def genparser(version, author, email, url):
 
     group = optparse.OptionGroup(parser, "Images output options")
 
-    group.add_option("-V", "--vsize", dest="vsize", metavar="VSIZE", default=750, type="int",
+    group.add_option("-V", "--vsize", dest="vsize", metavar="VSIZE", default=754, type="int",
                       help="the maximal vertical size of images in pixels [default: %default]")
 
-    group.add_option("-H", "--hsize", dest="hsize", metavar="HSIZE", default=580, type="int",
+    group.add_option("-H", "--hsize", dest="hsize", metavar="HSIZE", default=584, type="int",
                       help="the maximal horizontal size of images in pixels [default: %default]")
 
-    group.add_option("-C", "--colors", dest="colors", metavar="COLORS", default=16, type="int",
+    group.add_option("-C", "--colors", dest="colors", metavar="COLORS", default=32, type="int",
                       help="2-256, the number of output greyscale colors [default: %default]")
 
     group.add_option("-D", "--dither", dest="dither", default=False, action="store_true",

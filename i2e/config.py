@@ -1,4 +1,4 @@
-VERSION      = '1.2'
+VERSION      = '1.3'
 
 AUTHOR       = 'Stany MARCEL'
 AUTHOR_EMAIL = 'stanypub@gmail.com'

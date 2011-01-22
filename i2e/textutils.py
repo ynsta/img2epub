@@ -2,32 +2,43 @@
 
 import re
 import os
+import unicodedata
 
-amap = { 'a' : re.compile('[àáâãä]'),
-         'c' : re.compile('[ç]'),
-         'e' : re.compile('[èéêë]'),
-         'i' : re.compile('[ìíîï]'),
-         'n' : re.compile('[ñ]'),
-         'o' : re.compile('[òóôõö]'),
-         'u' : re.compile('[ùúûü]'),
-         'y' : re.compile('[ýÿ]'),
-         'A' : re.compile('[ÀÁÂÃÄ]'),
-         'C' : re.compile('[Ç]'),
-         'E' : re.compile('[ÈÉÊË]'),
-         'I' : re.compile('[ÌÍÎÏ]'),
-         'N' : re.compile('[Ñ]'),
-         'O' : re.compile('[ÒÓÔÕÖ]'),
-         'U' : re.compile('[ÙÚÛÜ]'),
-         'Y' : re.compile('[Ý]')}
+amap = { 'a' : ['à','á','â','ã','ä'],
+         'c' : ['ç'],
+         'e' : ['è','é','ê','ë'],
+         'i' : ['ì','í','î','ï'],
+         'n' : ['ñ'],
+         'o' : ['ò','ó','ô','õ','ö'],
+         'u' : ['ù','ú','û','ü'],
+         'y' : ['ý','ÿ'],
+         'A' : ['À','Á','Â','Ã','Ä'],
+         'C' : ['Ç'],
+         'E' : ['È','É','Ê','Ë'],
+         'I' : ['Ì','Í','Î','Ï'],
+         'N' : ['Ñ'],
+         'O' : ['Ò','Ó','Ô','Õ','Ö'],
+         'U' : ['Ù','Ú','Û','Ü'],
+         'Y' : ['Ý'] }
 
 def remove_accent(string):
-    for (c, reg) in amap.iteritems():
-        string = reg.sub(c, string)
+    for (c, la) in amap.iteritems():
+        for i in la:
+            string = string.replace(i, c)
     return string
+
+reg_specials = re.compile(u"[^0-9a-z ._'-]", re.I | re.U)
+reg_mulspaces = re.compile('\s+')
+
+def filify(string):
+    string = remove_accent(string)
+    string = unicode(string, errors = 'ignore')
+    string = reg_specials.sub('', string)
+    string = reg_mulspaces.sub(' ', string)
+    return string.strip()
 
 reg_num      = re.compile('([0-9]+)')
 reg_num_path = re.compile('([/:\\\]|[0-9]+)')
-
 
 def humansort(stringlist):
     def cut(string):
