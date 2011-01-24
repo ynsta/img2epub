@@ -15,6 +15,10 @@ def _lookup(names):
     return None
 
 def find(bin):
+    """
+    Search the programs or the list of programs in the path environ
+    return the value and store it in a cache table
+    """
     if type(bin) == str:
         bin = [ bin ]
     if os.name == 'nt':
@@ -31,12 +35,28 @@ def find(bin):
 def run(bin, args):
     if type(bin) == str:
         bin = [ bin ]
+
+    if os.name == 'nt':
+        bin  = [x.encode('iso-8859-1') for x in bin]
+        args = [x.encode('iso-8859-1') for x in args]
+
     path = find(bin)
     if not path:
         return (1, None, None)
+    if os.name == 'nt':
+        startupinfo = subprocess.STARTUPINFO()
+        try:
+            startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+        except:
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    else:
+        startupinfo = None
     p = subprocess.Popen([path] + args,
+                         startupinfo=startupinfo,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE,
-                         universal_newlines=True)
+                         universal_newlines=True,
+                         shell=False)
+
     (stdin, stderr) = p.communicate()
     return (p.returncode, stdin, stderr)
