@@ -32,7 +32,7 @@ class OutLog(QtCore.QObject):
         self.emit(QtCore.SIGNAL("logPosted(const QString &, const QColor &)"), msg, self.color)
 
 
-class EpubThread(QtCore.QThread):
+class EpubThreadConvert(QtCore.QThread):
 
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self, parent)
@@ -57,6 +57,36 @@ class EpubThread(QtCore.QThread):
                          self.chapter_list,
                          self.chapter_map,
                          self.setProgress)
+
+class EpubThreadExtract(QtCore.QThread):
+
+    def __init__(self, parent=None):
+        QtCore.QThread.__init__(self, parent)
+
+    def setParams(self, archive_list, out_dir):
+        self.archive_list = archive_list
+        self.out_dir      = out_dir
+        self.progress     = 0
+        self.outputs      = []
+
+    def getOutput(self):
+        return self.outputs
+
+    def setProgress(self):
+        self.progress = self.progress + 1
+        self.emit(QtCore.SIGNAL("progressValueChanged(int)"), self.progress)
+
+    def run(self):
+        self.progress = 0
+        self.outputs  = []
+        for a in self.archive_list:
+            print 'Extracting', a,
+            adir = os.path.join(self.out_dir, fileutils.rem_ext(os.path.basename(a)))
+            (r,s,e) = binutils.run('7z', ['x', a, '-y', '-o' + adir])
+            print 'Done'
+            self.setProgress()
+            if not r:
+                self.outputs.append(adir)
 
 
 class Img2Epub(QtGui.QWidget):
@@ -96,13 +126,21 @@ class Img2Epub(QtGui.QWidget):
         if error:
             sys.exit(1)
 
-        self.epubThread = EpubThread()
-        self.connect(self.epubThread,
+        self.epubThreadConvert = EpubThreadConvert()
+        self.connect(self.epubThreadConvert,
                      QtCore.SIGNAL("progressValueChanged(int)"),
                      self.setProgress)
-        self.connect(self.epubThread,
+        self.connect(self.epubThreadConvert,
                      QtCore.SIGNAL("finished()"),
-                     self.epubThreadFinished)
+                     self.epubThreadConvertFinished)
+
+        self.epubThreadExtract = EpubThreadExtract()
+        self.connect(self.epubThreadExtract,
+                     QtCore.SIGNAL("progressValueChanged(int)"),
+                     self.setProgress)
+        self.connect(self.epubThreadExtract,
+                     QtCore.SIGNAL("finished()"),
+                     self.epubThreadExtractFinished)
 
         self.tmpd = tempfile.mkdtemp()
 
@@ -161,7 +199,6 @@ class Img2Epub(QtGui.QWidget):
         self.runEnable()
 
 
-
     def __del__(self):
         shutil.rmtree(self.tmpd, ignore_errors=True)
 
@@ -174,6 +211,15 @@ class Img2Epub(QtGui.QWidget):
         if txt == '' or len(inputs) == 0 or self.inputs == inputs:
             return
 
+        self.disabled_widgets = [self.ui.lineEditOutput,
+                                 self.ui.lineEditInputs,
+                                 self.ui.toolButtonOutput,
+                                 self.ui.toolButtonInputs,
+                                 self.ui.toolButtonInputDir,
+                                 self.ui.pushButtonRun]
+        for w in self.disabled_widgets:
+            w.setEnabled(False)
+
         self.inputs = inputs
 
         notfound = ""
@@ -185,42 +231,10 @@ class Img2Epub(QtGui.QWidget):
             warnMessage(self, notfound)
             return
 
-        zinputs = []
-
-        # Extracting archives given as program arguments
         alist = fileutils.find_by_exts(inputs, config.ARCHEXTS)
-        for a in alist:
-            adir = os.path.join(self.tmpd, fileutils.rem_ext(os.path.basename(a)))
-            (r,s,e) = binutils.run('7z', ['x', a, '-y', '-o' + adir])
-            if not r:
-                zinputs.append(adir)
-
-        # Looking for images
-        flist = fileutils.find_by_exts(inputs + zinputs, config.IMGEXTS)
-        self.image_list   = [os.path.abspath(x) for x in flist]
-        self.chapter_map  = {}
-        self.chapter_list = []
-
-        for i in range(len(flist)):
-            cname = os.path.basename(os.path.dirname(flist[i]))
-            cname = textutils.sentencify(cname)
-            if not self.chapter_map.get(cname):
-                self.chapter_map[cname] = [i]
-                self.chapter_list.append(cname)
-            else:
-                self.chapter_map[cname].append(i)
-
-        chapter_tv_list = [QtGui.QTreeWidgetItem([c,]) for c in self.chapter_list]
-        for i in range(len(self.chapter_list)):
-            img_tv_list = [QtGui.QTreeWidgetItem([(self.image_list[c]),]) \
-                               for c in self.chapter_map[self.chapter_list[i]]]
-            chapter_tv_list[i].addChildren(img_tv_list)
-
-
-        while self.ui.treeWidgetFiles.takeTopLevelItem(0):
-            None
-
-        self.ui.treeWidgetFiles.addTopLevelItems(chapter_tv_list)
+        self.ui.progressBar.setRange(0, len(alist))
+        self.epubThreadExtract.setParams(alist, self.tmpd)
+        self.epubThreadExtract.start()
 
 
     def runEnable(self):
@@ -296,12 +310,12 @@ class Img2Epub(QtGui.QWidget):
         for w in self.disabled_widgets:
             w.setEnabled(False)
         self.ui.progressBar.setRange(0, len(self.image_list))
-        self.epubThread.setParams(self.opts,
+        self.epubThreadConvert.setParams(self.opts,
                                   self.ui.lineEditOutput.text(),
                                   self.image_list,
                                   self.chapter_list,
                                   self.chapter_map)
-        self.epubThread.start()
+        self.epubThreadConvert.start()
 
 
 
@@ -390,10 +404,46 @@ class Img2Epub(QtGui.QWidget):
         if state:
             self.opts.cut = None
 
-    def epubThreadFinished(self):
+    def epubThreadConvertFinished(self):
         for w in self.disabled_widgets:
             w.setEnabled(True)
         self.ui.progressBar.reset()
+
+    def epubThreadExtractFinished(self):
+
+        for w in self.disabled_widgets:
+            w.setEnabled(True)
+        self.ui.progressBar.reset()
+
+        inputs  = self.inputs
+        zinputs = self.epubThreadExtract.getOutput()
+
+        # Looking for images
+        flist = fileutils.find_by_exts(inputs + zinputs, config.IMGEXTS)
+        self.image_list   = [os.path.abspath(x) for x in flist]
+        self.chapter_map  = {}
+        self.chapter_list = []
+
+        for i in range(len(flist)):
+            cname = os.path.basename(os.path.dirname(flist[i]))
+            cname = textutils.sentencify(cname)
+            if not self.chapter_map.get(cname):
+                self.chapter_map[cname] = [i]
+                self.chapter_list.append(cname)
+            else:
+                self.chapter_map[cname].append(i)
+
+        chapter_tv_list = [QtGui.QTreeWidgetItem([c,]) for c in self.chapter_list]
+        for i in range(len(self.chapter_list)):
+            img_tv_list = [QtGui.QTreeWidgetItem([(self.image_list[c]),]) \
+                               for c in self.chapter_map[self.chapter_list[i]]]
+            chapter_tv_list[i].addChildren(img_tv_list)
+
+
+        while self.ui.treeWidgetFiles.takeTopLevelItem(0):
+            None
+
+        self.ui.treeWidgetFiles.addTopLevelItems(chapter_tv_list)
 
 
     def writeLog(self, msg, color):
