@@ -1,6 +1,7 @@
 #!/bin/env python
 # -*- coding: utf8 -*-
 
+import sys
 import os
 import tempfile
 import binutils
@@ -216,7 +217,6 @@ def image_xml(image):
 def img_convert(opts, src, dst, idx, convert_opts):
 
     (r, s, e) = binutils.run('identify', ['-format', '%w:%h', src])
-
     if r != 0 or e != '':
         sys.stderr.write(e)
         (w, h) = (0, 0)
