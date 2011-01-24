@@ -142,7 +142,7 @@ class Img2Epub(QtGui.QWidget):
                      QtCore.SIGNAL("finished()"),
                      self.epubThreadExtractFinished)
 
-        self.tmpd = tempfile.mkdtemp()
+        self.tmpd = tempfile.mkdtemp(prefix='img2epub_')
 
         self.inputs = None
 
