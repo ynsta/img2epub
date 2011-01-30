@@ -37,8 +37,8 @@ def run(bin, args):
         bin = [ bin ]
 
     if os.name == 'nt':
-        bin  = [x.encode('iso-8859-1') for x in bin]
-        args = [x.encode('iso-8859-1') for x in args]
+        bin  = [x.decode('iso-8859-1').encode('iso-8859-1') for x in bin]
+        args = [x.decode('iso-8859-1').encode('iso-8859-1') for x in args]
 
     path = find(bin)
     if not path:

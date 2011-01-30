@@ -53,7 +53,7 @@ def genparser(version, author, email, url):
     group.add_option("-H", "--hsize", dest="hsize", metavar="HSIZE", default=584, type="int",
                       help="the maximal horizontal size of images in pixels [default: %default]")
 
-    group.add_option("-C", "--colors", dest="colors", metavar="COLORS", default=32, type="int",
+    group.add_option("-C", "--colors", dest="colors", metavar="COLORS", default=64, type="int",
                       help="2-256, the number of output greyscale colors [default: %default]")
 
     group.add_option("-D", "--dither", dest="dither", default=False, action="store_true",

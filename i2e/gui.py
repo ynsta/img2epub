@@ -17,6 +17,7 @@ import textutils
 import binutils
 import fileutils
 import epub
+import imageviewer
 
 def criticalMessage(parent, msg):
     QtGui.QMessageBox.critical(parent, 'Img2Epub Critical Error', msg)
@@ -63,11 +64,11 @@ class EpubThreadExtract(QtCore.QThread):
     def __init__(self, parent=None):
         QtCore.QThread.__init__(self, parent)
 
-    def setParams(self, archive_list, out_dir):
-        self.archive_list = archive_list
-        self.out_dir      = out_dir
-        self.progress     = 0
-        self.outputs      = []
+    def setParams(self, inputs, out_dir):
+        self.inputs   = inputs
+        self.out_dir  = out_dir
+        self.progress = 0
+        self.outputs  = []
 
     def getOutput(self):
         return self.outputs
@@ -76,17 +77,25 @@ class EpubThreadExtract(QtCore.QThread):
         self.progress = self.progress + 1
         self.emit(QtCore.SIGNAL("progressValueChanged(int)"), self.progress)
 
+    def setProgressMax(self, val):
+        self.emit(QtCore.SIGNAL("progressMaxValueChanged(int)"), val)
+
     def run(self):
         self.progress = 0
         self.outputs  = []
-        for a in self.archive_list:
+        alist = fileutils.find_by_exts(self.inputs, config.ARCHEXTS)
+        self.setProgressMax(len(alist) + 1)
+        zinputs = []
+        for a in alist:
             print 'Extracting', a,
             adir = os.path.join(self.out_dir, fileutils.rem_ext(os.path.basename(a)))
             (r,s,e) = binutils.run('7z', ['x', a, '-y', '-o' + adir])
             print 'Done'
             self.setProgress()
             if not r:
-                self.outputs.append(adir)
+                zinputs.append(adir)
+        self.outputs = fileutils.find_by_exts(self.inputs + zinputs, config.IMGEXTS)
+        self.setProgress()
 
 
 class Img2Epub(QtGui.QWidget):
@@ -138,6 +147,9 @@ class Img2Epub(QtGui.QWidget):
         self.connect(self.epubThreadExtract,
                      QtCore.SIGNAL("progressValueChanged(int)"),
                      self.setProgress)
+        self.connect(self.epubThreadExtract,
+                     QtCore.SIGNAL("progressMaxValueChanged(int)"),
+                     self.setProgressMax)
         self.connect(self.epubThreadExtract,
                      QtCore.SIGNAL("finished()"),
                      self.epubThreadExtractFinished)
@@ -231,9 +243,7 @@ class Img2Epub(QtGui.QWidget):
             warnMessage(self, notfound)
             return
 
-        alist = fileutils.find_by_exts(inputs, config.ARCHEXTS)
-        self.ui.progressBar.setRange(0, len(alist))
-        self.epubThreadExtract.setParams(alist, self.tmpd)
+        self.epubThreadExtract.setParams(inputs, self.tmpd)
         self.epubThreadExtract.start()
 
 
@@ -404,6 +414,16 @@ class Img2Epub(QtGui.QWidget):
         if state:
             self.opts.cut = None
 
+    @QtCore.Slot(QtCore.QModelIndex)
+    def on_treeWidgetFiles_doubleClicked(self, index):
+        if not os.path.exists(index.data()):
+            return
+        self.imgViewer = imageviewer.ImageViewer(self.opts)
+        self.imgViewer.setImage(index.data())
+        self.imgViewer.show()
+
+
+
     def epubThreadConvertFinished(self):
         for w in self.disabled_widgets:
             w.setEnabled(True)
@@ -415,11 +435,8 @@ class Img2Epub(QtGui.QWidget):
             w.setEnabled(True)
         self.ui.progressBar.reset()
 
-        inputs  = self.inputs
-        zinputs = self.epubThreadExtract.getOutput()
-
         # Looking for images
-        flist = fileutils.find_by_exts(inputs + zinputs, config.IMGEXTS)
+        flist = self.epubThreadExtract.getOutput()
         self.image_list   = [os.path.abspath(x) for x in flist]
         self.chapter_map  = {}
         self.chapter_list = []
@@ -453,3 +470,6 @@ class Img2Epub(QtGui.QWidget):
 
     def setProgress(self, val):
         self.ui.progressBar.setValue(val)
+
+    def setProgressMax(self, val):
+        self.ui.progressBar.setRange(0, val)
