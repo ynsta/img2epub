@@ -4,28 +4,8 @@ import re
 import os
 import unicodedata
 
-amap = { 'a' : ['à','á','â','ã','ä'],
-         'c' : ['ç'],
-         'e' : ['è','é','ê','ë'],
-         'i' : ['ì','í','î','ï'],
-         'n' : ['ñ'],
-         'o' : ['ò','ó','ô','õ','ö'],
-         'u' : ['ù','ú','û','ü'],
-         'y' : ['ý','ÿ'],
-         'A' : ['À','Á','Â','Ã','Ä'],
-         'C' : ['Ç'],
-         'E' : ['È','É','Ê','Ë'],
-         'I' : ['Ì','Í','Î','Ï'],
-         'N' : ['Ñ'],
-         'O' : ['Ò','Ó','Ô','Õ','Ö'],
-         'U' : ['Ù','Ú','Û','Ü'],
-         'Y' : ['Ý'] }
-
 def remove_accent(string):
-    for (c, la) in amap.iteritems():
-        for i in la:
-            string = string.replace(i, c)
-    return string
+    return unicodedata.normalize('NFKD', string)
 
 reg_specials = re.compile(u"[^0-9a-z ._'-]", re.I | re.U)
 reg_mulspaces = re.compile('\s+')
