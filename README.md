@@ -14,7 +14,7 @@ Supported file formats : .cbz, .cbr, zip, rar, 7zip, directory
 
 ## Output format
 
-    Supported file formats : .epub (http://www.idpf.org/)
+Supported file formats : .epub (http://www.idpf.org/)
 
 ## Fonctionnality
 
